@@ -1,12 +1,15 @@
 package br.com.hamilton.currencyconverter;
+import java.io.IOException;
 import java.util.Locale;
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException, InterruptedException {
         Scanner input = new Scanner(System.in);
         Converter converter = new Converter();
-        double exchangeRate = 5.40;
+        ExchangeRateService exchangeRateService = new ExchangeRateService();
+        double exchangeRate = exchangeRateService.fetchExchangeRate();
+        System.out.printf(Locale.US, "DEBUG - Cotação completa: %.6f%n", exchangeRate);
         double amount;
 
         do {
