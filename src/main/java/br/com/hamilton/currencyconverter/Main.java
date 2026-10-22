@@ -9,12 +9,16 @@ public class Main {
         Converter converter = new Converter();
         ExchangeRateService exchangeRateService = new ExchangeRateService();
         double exchangeRate = exchangeRateService.fetchExchangeRate();
-        System.out.printf(Locale.US, "DEBUG - Cotação completa: %.6f%n", exchangeRate);
         double amount;
 
         do {
             System.out.print("Enter the amount in USD (0 to exit): ");
             amount = input.nextDouble();
+
+            if (amount < 0) {
+                System.out.println("Amount cannot be negative.");
+                continue;
+            }
 
             if (amount != 0) {
                 double result = converter.convert(amount, exchangeRate);

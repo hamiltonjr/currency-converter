@@ -26,7 +26,26 @@ public class ExchangeRateService {
                 HttpResponse.BodyHandlers.ofString()
         );
 
+        // tratamento de possíveis erros HTTP
+        if (response.statusCode() != 200) {
+            throw new IOException(
+                    "Frankfurter API returned HTTP status: "
+                            + response.statusCode()
+            );
+        }
+
+
         JsonNode json = objectMapper.readTree(response.body());
-        return json.get("rate").asDouble();
+        JsonNode rateNode = json.get("rate");
+
+            if (rateNode == null
+                || !rateNode.isNumber()
+                || rateNode.asDouble() <= 0) {
+            throw new IOException(
+                    "Invalid response from Frankfurter API: missing or invalid 'rate'."
+            );
+        }
+
+        return rateNode.asDouble();
     }
 }
