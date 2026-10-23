@@ -8,8 +8,16 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 public class ExchangeRateService {
-    private final HttpClient httpClient = HttpClient.newHttpClient();
+    private final HttpClient httpClient;
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    public ExchangeRateService() {
+        this(HttpClient.newHttpClient());
+    }
+
+    public ExchangeRateService(HttpClient httpClient) {
+        this.httpClient = httpClient;
+    }
 
     public double fetchExchangeRate() throws IOException, InterruptedException {
         URI uri = URI.create(
