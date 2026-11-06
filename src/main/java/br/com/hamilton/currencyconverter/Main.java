@@ -6,14 +6,16 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) throws IOException, InterruptedException {
-        Scanner input = new Scanner(System.in);
-        ExchangeRateService exchangeRateService = new ExchangeRateService();
-        double exchangeRate = exchangeRateService.fetchExchangeRate();
-
-        run(input, System.out, exchangeRate);
+        start(new Scanner(System.in), System.out, new ExchangeRateService());
     }
 
-    static void run(Scanner input, PrintStream output, double exchangeRate) {
+    static void start(Scanner input, PrintStream output, ExchangeRateService exchangeRateService)
+        throws IOException, InterruptedException {
+        double exchangeRate = exchangeRateService.fetchExchangeRate();
+        run(input, output, exchangeRate);
+    }
+
+    static void run(Scanner input, PrintStream output,double exchangeRate){
         Converter converter = new Converter();
         double amount;
 
