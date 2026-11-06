@@ -1,29 +1,35 @@
 package br.com.hamilton.currencyconverter;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.Locale;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) throws IOException, InterruptedException {
         Scanner input = new Scanner(System.in);
-        Converter converter = new Converter();
         ExchangeRateService exchangeRateService = new ExchangeRateService();
         double exchangeRate = exchangeRateService.fetchExchangeRate();
+
+        run(input, System.out, exchangeRate);
+    }
+
+    static void run(Scanner input, PrintStream output, double exchangeRate) {
+        Converter converter = new Converter();
         double amount;
 
         do {
-            System.out.print("Enter the amount in USD (0 to exit): ");
+            output.print("Enter the amount in USD (0 to exit): ");
             amount = input.nextDouble();
 
             if (amount < 0) {
-                System.out.println("Amount cannot be negative.");
+                output.println("Amount cannot be negative.");
                 continue;
             }
 
             if (amount != 0) {
                 double result = converter.convert(amount, exchangeRate);
 
-                System.out.printf(
+                output.printf(
                         Locale.US,
                         """
                                 ========== Currency Converter ==========
@@ -41,7 +47,6 @@ public class Main {
             }
         } while (amount != 0);
 
-        input.close();
-        System.out.println("Goodbye!");
+        output.println("Goodbye!");
     }
 }

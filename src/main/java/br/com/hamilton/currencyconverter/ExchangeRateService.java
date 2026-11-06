@@ -20,18 +20,12 @@ public class ExchangeRateService {
     }
 
     public double fetchExchangeRate() throws IOException, InterruptedException {
-        URI uri = URI.create(
-                "https://api.frankfurter.dev/v2/rate/usd/brl"
-        );
+        URI uri = URI.create("https://api.frankfurter.dev/v2/rate/usd/brl");
 
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(uri)
-                .GET()
-                .build();
+        HttpRequest request = HttpRequest.newBuilder().uri(uri).GET().build();
 
         HttpResponse<String> response = httpClient.send(
-                request,
-                HttpResponse.BodyHandlers.ofString()
+                request, HttpResponse.BodyHandlers.ofString()
         );
 
         // tratamento de possíveis erros HTTP
@@ -42,15 +36,14 @@ public class ExchangeRateService {
             );
         }
 
-
         JsonNode json = objectMapper.readTree(response.body());
         JsonNode rateNode = json.get("rate");
 
-            if (rateNode == null
-                || !rateNode.isNumber()
-                || rateNode.asDouble() <= 0) {
-            throw new IOException(
-                    "Invalid response from Frankfurter API: missing or invalid 'rate'."
+        if (rateNode == null
+            || !rateNode.isNumber()
+            || rateNode.asDouble() <= 0) {
+        throw new IOException(
+                "Invalid response from Frankfurter API: missing or invalid 'rate'."
             );
         }
 
