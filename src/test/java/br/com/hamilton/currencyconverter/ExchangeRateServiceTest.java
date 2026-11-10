@@ -12,6 +12,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ExchangeRateServiceTest {
     @Test
+    void shouldCreateServiceWithDefaultHttpClient() {
+        ExchangeRateService service = new ExchangeRateService();
+
+        org.junit.jupiter.api.Assertions.assertNotNull(service);
+    }
+
+    @Test
     void shouldReturnExchangeRateWhenApiRespondsSuccessfully()
             throws IOException, InterruptedException {
         HttpClient httpClient = mock(HttpClient.class);
@@ -218,6 +225,7 @@ class ExchangeRateServiceTest {
         );
     }
 
+    @Test
     void shouldThrowIOExceptionWhenRateIsInvalid()
             throws IOException, InterruptedException {
         HttpClient httpClient = mock(HttpClient.class);
@@ -248,4 +256,22 @@ class ExchangeRateServiceTest {
                 exception.getMessage()
         );
     }
+
+
+    @Test
+    void shouldThrowInterruptedExceptionWhenRequestIsInterrupted() throws Exception {
+        HttpClient httpClient = mock(HttpClient.class);
+        ExchangeRateService service = new ExchangeRateService(httpClient);
+
+        when(httpClient.send(
+                any(HttpRequest.class),
+                any(HttpResponse.BodyHandler.class)
+        )).thenThrow(new InterruptedException("Request interrupted"));
+
+        assertThrows(
+                InterruptedException.class,
+                service::fetchExchangeRate
+        );
+    }
+
 }
