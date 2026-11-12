@@ -40,14 +40,17 @@ public class MainTest {
     }
 
     @Test
-    void shouldConvertAmountAndExit() {
+    void shouldConvertAmountAndExit()
+            throws IOException, InterruptedException {
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream("100\n0\n"
                 .getBytes(StandardCharsets.UTF_8));
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         PrintStream output = new PrintStream(byteArrayOutputStream);
         Scanner input = new Scanner(byteArrayInputStream);
 
-        Main.run(input, output, 5.50);
+        ExchangeRateService exchangeRateService = Mockito.mock(ExchangeRateService.class);
+        Mockito.when(exchangeRateService.fetchExchangeRate()).thenReturn(5.50);
+        Main.run(input, output, exchangeRateService);
 
         String consoleOutput = byteArrayOutputStream.toString();
         Assertions.assertTrue(consoleOutput.contains("Converted amount..: R$ 550.00"));
@@ -55,28 +58,37 @@ public class MainTest {
     }
 
     @Test
-    void shouldDisplayErrorWhenAmountIsNegative() {
+    void shouldDisplayErrorWhenAmountIsNegative()
+            throws IOException, InterruptedException {
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream("-1\n0\n"
                 .getBytes(StandardCharsets.UTF_8));
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         PrintStream output = new PrintStream(byteArrayOutputStream);
         Scanner input = new Scanner(byteArrayInputStream);
 
-        Main.run(input, output, 5.50);
+        ExchangeRateService exchangeRateService = Mockito.mock(ExchangeRateService.class);
+        Mockito.when(exchangeRateService.fetchExchangeRate()).thenReturn(5.50);
+        Main.run(input, output, exchangeRateService);
 
         String consoleOutput = byteArrayOutputStream.toString();
         Assertions.assertTrue(consoleOutput.contains("Amount cannot be negative"));
     }
 
     @Test
-    void shouldConvertMultipleAmountsAndExit() {
+    void shouldConvertMultipleAmountsAndExit()
+            throws IOException, InterruptedException {
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream("1\n2\n3\n0\n"
                 .getBytes(StandardCharsets.UTF_8));
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         PrintStream output = new PrintStream(byteArrayOutputStream);
         Scanner input = new Scanner(byteArrayInputStream);
 
-        Main.run(input, output, 5.50);
+        ExchangeRateService exchangeRateService = Mockito.mock(ExchangeRateService.class);
+        Mockito.when(exchangeRateService.fetchExchangeRate()).thenReturn(5.50);
+        Main.run(input, output, exchangeRateService);
+
+        Mockito.verify(exchangeRateService, Mockito.times(1))
+                .fetchExchangeRate();
 
         String consoleOutput = byteArrayOutputStream.toString();
         Assertions.assertTrue(consoleOutput.contains("Converted amount..: R$ 5.50"));
@@ -86,22 +98,20 @@ public class MainTest {
 
     @Test
     void shouldStartApplicationAndExitWhenInputIsZero()
-        throws IOException, InterruptedException {
+            throws IOException, InterruptedException {
         ExchangeRateService exchangeRateService = Mockito.mock(ExchangeRateService.class);
-        Mockito.when(exchangeRateService.fetchExchangeRate()).thenReturn(5.47);
 
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream("0\n".getBytes(StandardCharsets.UTF_8));
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
         PrintStream output = new PrintStream(byteArrayOutputStream);
         Scanner input = new Scanner(byteArrayInputStream);
 
         Main.start(input, output, exchangeRateService);
         String consoleOutput = byteArrayOutputStream.toString();
         Assertions.assertTrue(consoleOutput.contains("Goodbye!"));
-        Mockito.verify(exchangeRateService, Mockito.times(1))
-                .fetchExchangeRate();
+        Mockito.verify(exchangeRateService, Mockito.never()).fetchExchangeRate();
     }
-
 
     @Test
     void shouldStartApplicationConvertAmountAndExit()

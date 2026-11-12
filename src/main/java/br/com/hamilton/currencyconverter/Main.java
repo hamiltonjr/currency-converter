@@ -5,49 +5,55 @@ import java.util.Locale;
 import java.util.Scanner;
 
 public class Main {
+    private Main() {}
+
     public static void main(String[] args) throws IOException, InterruptedException {
         start(new Scanner(System.in), System.out, new ExchangeRateService());
     }
 
     static void start(Scanner input, PrintStream output, ExchangeRateService exchangeRateService)
         throws IOException, InterruptedException {
-        double exchangeRate = exchangeRateService.fetchExchangeRate();
-        run(input, output, exchangeRate);
+        run(input, output, exchangeRateService);
     }
 
-    static void run(Scanner input, PrintStream output,double exchangeRate){
+    static void run(Scanner input, PrintStream output, ExchangeRateService exchangeRateService)
+            throws IOException, InterruptedException {
         Converter converter = new Converter();
+        Double exchangeRate = null;
         double amount;
 
-        do {
+        while (true) {
             output.print("Enter the amount in USD (0 to exit): ");
             amount = input.nextDouble();
+
+            if (amount == 0) break;
 
             if (amount < 0) {
                 output.println("Amount cannot be negative.");
                 continue;
             }
 
-            if (amount != 0) {
-                double result = converter.convert(amount, exchangeRate);
-
-                output.printf(
-                        Locale.US,
-                        """
-                                ========== Currency Converter ==========
-                                
-                                Amount to convert.: US$ %.2f
-                                Exchange rate.....: 1 USD = R$ %.2f
-                                Converted amount..: R$ %.2f
-                                
-                                ========================================
-                                %n""",
-                        amount,
-                        exchangeRate,
-                        result
-                );
+            if (exchangeRate == null) {
+                exchangeRate = exchangeRateService.fetchExchangeRate();
             }
-        } while (amount != 0);
+
+            double result = converter.convert(amount, exchangeRate);
+            output.printf(
+                    Locale.US,
+                    """
+                            ========== Currency Converter ==========
+                            
+                            Amount to convert.: US$ %.2f
+                            Exchange rate.....: 1 USD = R$ %.2f
+                            Converted amount..: R$ %.2f
+                            
+                            ========================================
+                            %n""",
+                    amount,
+                    exchangeRate,
+                    result
+            );
+        }
 
         output.println("Goodbye!");
     }
