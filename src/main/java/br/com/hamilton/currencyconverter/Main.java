@@ -44,7 +44,7 @@ public class Main {
                             ========== Currency Converter ==========
                             
                             Amount to convert.: US$ %.2f
-                            Exchange rate.....: 1 USD = R$ %.2f
+                            Exchange rate.....: 1 USD = R$ %.4f
                             Converted amount..: R$ %.2f
                             
                             ========================================

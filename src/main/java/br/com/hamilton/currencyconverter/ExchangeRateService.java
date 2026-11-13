@@ -20,33 +20,37 @@ public class ExchangeRateService {
     }
 
     public double fetchExchangeRate() throws IOException, InterruptedException {
-        URI uri = URI.create("https://api.frankfurter.dev/v2/rate/usd/brl");
-
+        URI uri = URI.create("https://economia.awesomeapi.com.br/json/last/USD-BRL");
         HttpRequest request = HttpRequest.newBuilder().uri(uri).GET().build();
-
-        HttpResponse<String> response = httpClient.send(
-                request, HttpResponse.BodyHandlers.ofString()
-        );
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
         // tratamento de possíveis erros HTTP
         if (response.statusCode() != 200) {
             throw new IOException(
-                    "Frankfurter API returned HTTP status: "
+                    "Awesome API returned HTTP status: "
                             + response.statusCode()
             );
         }
 
         JsonNode json = objectMapper.readTree(response.body());
-        JsonNode rateNode = json.get("rate");
+        JsonNode rateNode = json.path("USDBRL").path("bid");
 
-        if (rateNode == null
-            || !rateNode.isNumber()
-            || rateNode.asDouble() <= 0) {
-        throw new IOException(
-                "Invalid response from Frankfurter API: missing or invalid 'rate'."
-            );
+        if (!rateNode.isTextual()) {
+            throw new IOException("Invalid response from AwesomeAPI: missing or invalid 'bid'.");
         }
 
-        return rateNode.asDouble();
+        double rate;
+
+        try {
+            rate = Double.parseDouble(rateNode.asText());
+        } catch (NumberFormatException e) {
+            throw new IOException("Invalid response from AwesomeAPI: invalid 'bid'.", e);
+        }
+
+        if (!Double.isFinite(rate) || rate <= 0) {
+            throw new IOException("Invalid response from AwesomeAPI: 'bid' must be positive.");
+        }
+
+        return rate;
     }
 }

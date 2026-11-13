@@ -14,7 +14,6 @@ class ExchangeRateServiceTest {
     @Test
     void shouldCreateServiceWithDefaultHttpClient() {
         ExchangeRateService service = new ExchangeRateService();
-
         org.junit.jupiter.api.Assertions.assertNotNull(service);
     }
 
@@ -31,7 +30,7 @@ class ExchangeRateServiceTest {
                     "date": "2026-10-22",
                     "base": "USD",
                     "quote": "BRL",
-                    "rate": 5.40
+                    "USDBRL": {"bid": "5.6513"}
                 }
                 """);
         when(httpClient.send(
@@ -41,7 +40,7 @@ class ExchangeRateServiceTest {
 
         ExchangeRateService service = new ExchangeRateService(httpClient);
         double rate = service.fetchExchangeRate();
-        assertEquals(5.40, rate, 0.001);
+        assertEquals(5.6513, rate, 0.0001);
     }
 
 
@@ -59,11 +58,7 @@ class ExchangeRateServiceTest {
         )).thenReturn(response);
 
         ExchangeRateService service = new ExchangeRateService(httpClient);
-
-        assertThrows(
-                IOException.class,
-                service::fetchExchangeRate
-        );
+        assertThrows(IOException.class, service::fetchExchangeRate);
     }
 
     @Test
@@ -87,41 +82,9 @@ class ExchangeRateServiceTest {
         )).thenReturn(response);
 
         ExchangeRateService service = new ExchangeRateService(httpClient);
-
-        assertThrows(
-                IOException.class,
-                service::fetchExchangeRate
-        );
+        assertThrows(IOException.class, service::fetchExchangeRate);
     }
 
-    @Test
-    void shouldThrowExceptionWhenRateIsZero()
-            throws IOException, InterruptedException {
-        HttpClient httpClient = mock(HttpClient.class);
-
-        @SuppressWarnings("unchecked")
-        HttpResponse<String> response = mock(HttpResponse.class);
-        when(response.statusCode()).thenReturn(200);
-        when(response.body()).thenReturn("""
-                {
-                    "date": "2026-10-22",
-                    "rate": 0.0,
-                    "base": "USD",
-                    "quote": "BRL"
-                }
-                """);
-        when(httpClient.send(
-                any(java.net.http.HttpRequest.class),
-                any(HttpResponse.BodyHandler.class)
-        )).thenReturn(response);
-
-        ExchangeRateService service = new ExchangeRateService(httpClient);
-
-        assertThrows(
-                IOException.class,
-                service::fetchExchangeRate
-        );
-    }
 
     @Test
     void shouldThrowExceptionWhenRateIsNegative()
@@ -134,7 +97,7 @@ class ExchangeRateServiceTest {
         when(response.body()).thenReturn("""
                 {
                     "date": "2026-10-22",
-                    "rate": -1.0,
+                    "USDBRL": {"bid": "-1.0"},
                     "base": "USD",
                     "quote": "BRL"
                 }
@@ -145,11 +108,7 @@ class ExchangeRateServiceTest {
         )).thenReturn(response);
 
         ExchangeRateService service = new ExchangeRateService(httpClient);
-
-        assertThrows(
-                IOException.class,
-                service::fetchExchangeRate
-        );
+        assertThrows(IOException.class, service::fetchExchangeRate);
     }
 
     @Test
@@ -167,11 +126,7 @@ class ExchangeRateServiceTest {
         )).thenReturn(response);
 
         ExchangeRateService service = new ExchangeRateService(httpClient);
-
-        assertThrows(
-                IOException.class,
-                service::fetchExchangeRate
-        );
+        assertThrows(IOException.class, service::fetchExchangeRate);
     }
 
 
@@ -186,11 +141,7 @@ class ExchangeRateServiceTest {
         )).thenThrow(new IOException("Connection failed"));
 
         ExchangeRateService service = new ExchangeRateService(httpClient);
-
-        assertThrows(
-                IOException.class,
-                service::fetchExchangeRate
-        );
+        assertThrows(IOException.class, service::fetchExchangeRate);
     }
 
     @Test
@@ -204,7 +155,7 @@ class ExchangeRateServiceTest {
         when(response.body()).thenReturn("""
         {
             "date": "2026-10-22",
-            "rate": 0,
+            "USDBRL": {"bid": "0.0"},
             "base": "USD",
             "quote": "BRL"
         }
@@ -214,15 +165,10 @@ class ExchangeRateServiceTest {
                 any(HttpResponse.BodyHandler.class)
         )).thenReturn(response);
 
-        IOException exception = assertThrows(
-                IOException.class,
-                service::fetchExchangeRate
-        );
+        IOException exception = assertThrows(IOException.class, service::fetchExchangeRate);
 
-        assertEquals(
-                "Invalid response from Frankfurter API: missing or invalid 'rate'.",
-                exception.getMessage()
-        );
+        assertEquals("Invalid response from AwesomeAPI: 'bid' must be positive.",
+                exception.getMessage());
     }
 
     @Test
@@ -236,7 +182,7 @@ class ExchangeRateServiceTest {
         when(response.body()).thenReturn("""
         {
             "date": "2026-10-22",
-            "rate": "5.50",
+            "USDBRL": {"bid": "abc"},
             "base": "USD",
             "quote": "BRL"
         }
@@ -246,13 +192,9 @@ class ExchangeRateServiceTest {
                 any(HttpResponse.BodyHandler.class)
         )).thenReturn(response);
 
-        IOException exception = assertThrows(
-                IOException.class,
-                service::fetchExchangeRate
-        );
-
+        IOException exception = assertThrows(IOException.class, service::fetchExchangeRate);
         assertEquals(
-                "Invalid response from Frankfurter API: missing or invalid 'rate'.",
+                "Invalid response from AwesomeAPI: invalid 'bid'.",
                 exception.getMessage()
         );
     }
@@ -267,11 +209,37 @@ class ExchangeRateServiceTest {
                 any(HttpRequest.class),
                 any(HttpResponse.BodyHandler.class)
         )).thenThrow(new InterruptedException("Request interrupted"));
-
-        assertThrows(
-                InterruptedException.class,
-                service::fetchExchangeRate
-        );
+        assertThrows(InterruptedException.class, service::fetchExchangeRate);
     }
 
+    @Test
+    void shouldThrowIOExceptionWhenRateIsNotFinite()
+        throws IOException, InterruptedException {
+        HttpClient httpClient = mock(HttpClient.class);
+        ExchangeRateService service = new ExchangeRateService(httpClient);
+
+        HttpResponse<String> response = mock(HttpResponse.class);
+
+        when(response.statusCode()).thenReturn(200);
+        when(response.body()).thenReturn("""
+        {
+            "USDBRL": {"bid": "Infinity"}
+        }
+        """);
+
+        when(httpClient.send(
+                any(HttpRequest.class),
+                any(HttpResponse.BodyHandler.class)
+        )).thenReturn(response);
+
+        IOException exception = assertThrows(
+                IOException.class,
+                service::fetchExchangeRate
+        );
+
+        assertEquals(
+                "Invalid response from AwesomeAPI: 'bid' must be positive.",
+                exception.getMessage()
+        );
+    }
 }
