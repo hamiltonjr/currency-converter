@@ -1,23 +1,26 @@
 # Currency Converter
 
-A simple command-line currency converter built with Java. The application retrieves the USD-to-BRL exchange rate from the Frankfurter API and converts amounts from US dollars to Brazilian reais.
+A Java 17-based command-line application that converts US dollars (USD) into Brazilian reais (BRL) using real-time exchange rate data retrieved from the [AwesomeAPI](https://docs.awesomeapi.com.br/api-de-moedas?utm_source=chatgpt.com). Built with object-oriented programming principles, the application features input validation, HTTP communication, JSON processing,  exception handling and automated testing.
 
 ## Features
 
-- Fetches exchange rates from the Frankfurter API.
+- Fetches exchange rates from the [Awesome API](https://docs.awesomeapi.com.br/api-de-moedas?utm_source=chatgpt.com).
 - Converts USD to BRL using the retrieved exchange rate.
 - Accepts multiple amounts in a single execution.
 - Rejects negative amounts.
 - Validates the HTTP response and exchange rate data.
+- Fetches the exchange rate only when a valid amount is entered.
 - Exits when the user enters `0`.
 
 ## Technologies
 
-- Java 17
-- Maven
-- Jackson Databind
-- Java HTTP Client
-- Frankfurter API
+- [Java 17](https://docs.oracle.com/en/java/javase/17/?utm_source=chatgpt.com)
+- [Maven](https://maven.apache.org/guides/?utm_source=chatgpt.com)
+- [Jackson Databind](https://github.com/FasterXML/jackson?utm_source=chatgpt.com)
+- [AwesomeAPI](https://docs.awesomeapi.com.br/api-de-moedas?utm_source=chatgpt.com)
+- [JUnit 5](https://junit.org/junit5/docs/current/user-guide/?utm_source=chatgpt.com)
+- [Mockito](https://javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/Mockito.html?utm_source=chatgpt.com)
+- [JaCoCo](https://www.jacoco.org/jacoco/trunk/doc/?utm_source=chatgpt.com)
 
 ## Requirements
 
@@ -69,13 +72,13 @@ Goodbye!
 
 ## API
 
-This project uses the [Frankfurter API](https://frankfurter.dev/) to retrieve reference exchange rates. No API key is required.
+This project uses the [Awesome API](https://docs.awesomeapi.com.br/api-de-moedas?utm_source=chatgpt.com) to retrieve reference exchange rates. No API key is required.
 
 The application fetches the USD-to-BRL rate when it starts and uses that rate for the duration of the execution.
 
 ## Project Goals
 
-This project is part of my Java development portfolio and demonstrates HTTP requests, JSON parsing, input validation, exception handling, and object-oriented programming.
+This project is part of my Java development portfolio and demonstrates HTTP requests, JSON parsing, input validation, exception handling, tests and object-oriented programming.
 
 ## Author
 
